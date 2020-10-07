@@ -1,0 +1,6 @@
+{
+  "id": "targeting-choose-region",
+  "name": "Choose region",
+  "srcdoc": "./build/index.html",
+  "fieldTypes": ["Entry"]
+}

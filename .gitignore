@@ -1,0 +1,14 @@
+.env.yaml
+.env
+
+# For contentful-extensions/
+
+# Parcel-bundler cache
+.cache
+
+# Dependency directories
+node_modules/
+
+# Build
+build/*
+!/build/index.html

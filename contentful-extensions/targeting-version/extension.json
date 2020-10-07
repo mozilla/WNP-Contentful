@@ -1,0 +1,6 @@
+{
+  "id": "targeting-choose-version",
+  "name": "Choose version",
+  "srcdoc": "./build/index.html",
+  "fieldTypes": ["Entry"]
+}

@@ -1,0 +1,6 @@
+{
+  "id": "targeting-choose-locale",
+  "name": "Choose locale",
+  "srcdoc": "./build/index.html",
+  "fieldTypes": ["Entry"]
+}
