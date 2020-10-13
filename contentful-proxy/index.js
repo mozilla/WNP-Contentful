@@ -1,34 +1,17 @@
-const https = require("https");
+const contentful = require("contentful");
+const { transform } = require("./transform");
 
-const ENDPOINT = `https://cdn.contentful.com/spaces/${process.env.SPACE_ID}/environments/master/entries?access_token=${process.env.ACCESS_TOKEN}&content_type=whatsNewBadge`;
+const client = contentful.createClient({
+  space: process.env.SPACE_ID,
+  accessToken: process.env.ACCESS_TOKEN,
+});
 
-function fetchContent() {
-  return new Promise((resolve, reject) => {
-    const req = https.get(ENDPOINT, (res) => {
-      let body = "";
-
-      res.setEncoding("utf8");
-
-      res.on("data", (chunk) => {
-        body += chunk;
-      });
-
-      res.on("end", () => {
-        try {
-          let output = JSON.parse(body);
-          resolve({
-            status: res.statusCode,
-            data: output
-          });
-        } catch (err) {
-          reject(err);
-        }
-      });
-    });
-
-    req.on("error", reject);
-    req.end();
+async function fetchContent() {
+  const entries = await client.getEntries({
+    content_type: "whatsNewPanel",
+    include: 3,
   });
+  return entries.items.map((entry) => entry.fields);
 }
 
 /**
@@ -41,10 +24,10 @@ function fetchContent() {
  */
 exports.wnpGET = async (req, res) => {
   try {
-    const { data } = await fetchContent();
-    const messages = data.items.map(item => item.fields);
+    const entries = await fetchContent();
+    const messages = transform(entries);
     res.json({ messages });
   } catch (err) {
     res.error(500).json({ error: `${err}` });
   }
-}
+};
