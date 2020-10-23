@@ -8,6 +8,13 @@ const client = contentful.createClient({
   accessToken: process.env.ACCESS_TOKEN,
 });
 
+// Contentful preview client
+const previewClient = contentful.createClient({
+  space: process.env.SPACE_ID,
+  accessToken: process.env.PREVIEW_TOKEN,
+  host: "preview.contentful.com",
+})
+
 const auth = Buffer.from(
   `${process.env.KINTO_USER}:${process.env.KINTO_PASSWORD}`
 ).toString("base64");
@@ -29,6 +36,14 @@ async function fetchAll() {
 
 async function fetchOne(id) {
   const entry = await client.getEntry(id, {
+    content_type: "whatsNewPanel",
+    include: 3,
+  });
+  return entry.fields;
+}
+
+async function fetchOnePreview(id) {
+  const entry = await previewClient.getEntry(id, {
     content_type: "whatsNewPanel",
     include: 3,
   });
@@ -75,15 +90,17 @@ exports.wnpGET = async (req, res) => {
         res.status(401).json({ error: "Unauthorized request" });
       }
       try {
-        const entry = await fetchOne(req.body.sys.id);
-        const [parsed] = transform([entry]);
         const [_type, _entry, publishState] = req
           .get("x-contentful-topic")
           .split(".");
         if (publishState === "publish") {
+          const entry = await fetchOne(req.body.sys.id);
+          const [parsed] = transform([entry]);
           kintoStore.createRecord(parsed);
           res.status(201).json({ message: "ok" });
         } else if (publishState === "unpublish") {
+          const entry = await fetchOnePreview(req.body.sys.id);
+          const [parsed] = transform([entry]);
           kintoStore.deleteRecord(parsed.id);
           res.status(200).json({ message: "ok" });
         } else {
