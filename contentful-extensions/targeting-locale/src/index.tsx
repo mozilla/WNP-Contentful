@@ -25,7 +25,9 @@ interface AppState {
   value?: string;
 }
 
+const ALL_LOCALES = "All locales";
 const LOCALES = [
+  ALL_LOCALES,
   "de",
   "en-CA",
   "en-US",
@@ -40,6 +42,7 @@ const LOCALES = [
 ];
 
 const LANGUAGES = [
+  ALL_LOCALES,
   "en",
   "es",
   "de",
@@ -59,13 +62,18 @@ class App extends React.Component<AppProps, AppState> {
     this.state = {
       chooseLocale: props.sdk.entry.fields.chooseLocale.getValue() || false,
       localeType: props.sdk.entry.fields.localeType.getValue() || "locale",
-      value: props.sdk.entry.fields.value.getValue()
+      value: props.sdk.entry.fields.value.getValue() || ALL_LOCALES
     };
   }
 
   onChooseLocaleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const chooseLocale = event.target.value === 'yes';
     this.setState({ chooseLocale });
+    if (!chooseLocale) {
+      const value = ALL_LOCALES;
+      this.setState({ value });
+      this.props.sdk.entry.fields.value.setValue(ALL_LOCALES);
+    }
     this.props.sdk.entry.fields.chooseLocale.setValue(chooseLocale);
   };
 

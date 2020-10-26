@@ -23,7 +23,8 @@ interface AppState {
   version?: string;
 }
 
-const VERSIONS = ["80", "81", "82", "83", "84", "85"];
+const ALL_VERSIONS = "All versions";
+const VERSIONS = [ALL_VERSIONS, "80", "81", "82", "83", "84", "85", "86"];
 
 class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
@@ -41,6 +42,11 @@ class App extends React.Component<AppProps, AppState> {
 
   onChooseVersionChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const chooseVersion = event.target.value === 'yes';
+    if (!chooseVersion) {
+      const version = ALL_VERSIONS;
+      this.setState({ version });
+      this.props.sdk.entry.fields.version.setValue(ALL_VERSIONS);
+    }
     this.setState({ chooseVersion });
     this.props.sdk.entry.fields.chooseVersion.setValue(chooseVersion);
   };

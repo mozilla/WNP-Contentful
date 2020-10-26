@@ -23,7 +23,9 @@ interface AppState {
   region?: string;
 }
 
+const ALL_REGIONS = "All regions";
 const REGIONS = [
+  [ALL_REGIONS, ALL_REGIONS],
   ["BR", "Brazil"],
   ["CA", "Canada"],
   ["CN", "China"],
@@ -41,7 +43,7 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
 
     this.state = {
-      region: props.sdk.entry.fields.region.getValue(),
+      region: props.sdk.entry.fields.region.getValue() || ALL_REGIONS,
       chooseRegion: props.sdk.entry.fields.chooseRegion.getValue() || false
     };
   }
@@ -52,6 +54,11 @@ class App extends React.Component<AppProps, AppState> {
 
   onChooseRegionChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const chooseRegion = event.target.value === 'yes';
+    if (!chooseRegion) {
+      const region = ALL_REGIONS;
+      this.setState({ region });
+      this.props.sdk.entry.fields.region.setValue(ALL_REGIONS);
+    }
     this.setState({ chooseRegion });
     this.props.sdk.entry.fields.chooseRegion.setValue(chooseRegion);
   };
